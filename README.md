@@ -43,7 +43,7 @@ En este proyecto se realizó un análisis exploratorio de datos a partir de un c
 ## Procesamiento y análisis
 
 __Conectar/Importar Datos a Otras Herramientas__
-- Se creó el reto técnico y el conjunto de datos **Dataset** en **BigQuery**.
+- Se creó el proyecto reto-tecnico y el conjunto de datos **Dataset** en **BigQuery**.
 - Tablas importadas: `citi_bike_trip`.
 
 __1. Identificar y Manejar Valores Nulos__
