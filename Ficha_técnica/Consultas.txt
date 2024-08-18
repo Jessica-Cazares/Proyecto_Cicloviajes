@@ -1,0 +1,172 @@
+﻿Consultas BigQuery: Proyecto Análisis de Datos
+
+
+Titulo: Proyecto Cicloviajes
+
+
+Lenguajes:
+* SQL
+
+
+Classic Queries:
+
+
+---Query para identificar valores nulos
+SELECT
+ COUNTIF(tripduration IS NULL) AS trip_duration_nulls,
+ COUNTIF(stoptime IS NULL) AS stoptime_nulls,
+ COUNTIF(start_station_id IS NULL) AS start_station_id_nulls,
+ COUNTIF(start_station_name IS NULL) AS start_station_name_nulls,
+ COUNTIF(start_station_latitude IS NULL) AS start_station_latitude_nulls,
+ COUNTIF(start_station_longitude IS NULL) AS start_station_longitude_nulls,
+ COUNTIF(bikeid IS NULL) AS bikeid_nulls,
+ COUNTIF(usertype IS NULL) AS usertype_nulls,
+ COUNTIF(birth_year IS NULL) AS birth_year_nulls,
+ COUNTIF(gender IS NULL) AS gender_nulls,
+ COUNTIF(customer_plan IS NULL) AS customer_plan_nulls
+FROM
+ `Dataset.citi_bike_trip`;
+
+
+
+
+ ---Query para excluir valores nulos de birth_year y la variable customer_plan
+SELECT
+*
+EXCEPT (customer_plan)
+FROM `Dataset.citi_bike_trip`
+WHERE birth_year is not null;
+
+
+---Query para identificar valores duplicados
+SELECT
+ bikeid,
+ stoptime,
+ start_station_id,
+ COUNT(*) AS duplicados
+FROM
+ `Dataset.citi_bike_trip`
+GROUP BY
+ bikeid,
+ stoptime,
+ start_station_id
+HAVING
+ duplicados >1;
+
+
+---Query para extraer la fecha de stoptime
+SELECT
+*,
+DATE(stoptime) AS stopdate
+FROM `Dataset.citi_bike_trip`;
+
+
+---Query para transformar trip_duration de segundos a minutos
+SELECT
+ *,
+ tripduration / 60.0 AS tripduration_min
+FROM
+ `Dataset.citi_bike_trip`;
+
+
+---Query para calcular las metricas de uso de un día promedio
+SELECT
+ AVG(tripduration_min) AS avg_tripduration_min,
+ MAX(tripduration_min) AS max_tripduration,
+ MIN(tripduration_min) AS min_tripduration,
+ STDDEV(tripduration_min) AS stddev_tripduration,
+ COUNT (*) / COUNT(DISTINCT stopdate) AS avg_trips_per_day
+FROM
+ `Dataset.citi_bike_trip_limpia`;
+
+
+
+
+ ---Query para métricas historicas, total de viajes
+SELECT
+ count (*) AS total_trips
+FROM
+ `Dataset.citi_bike_trip_limpia`;
+
+
+ ---Query para crecimiento de viajes a lo largo del tiempo
+SELECT
+ stopdate,
+ COUNT (*) AS daily_trips
+FROM
+ `Dataset.citi_bike_trip_limpia`
+GROUP BY
+ stopdate
+ORDER BY
+ stopdate;
+
+
+ ---Query para el total de viajes por usuarios segun genero, edad y tipo de suscripcion
+SELECT
+ gender,
+ EXTRACT(YEAR
+ FROM
+   CURRENT_DATE()) - birth_year AS age_group,
+ usertype,
+ COUNT(*) AS total_trips
+FROM
+ `Dataset.citi_bike_trip_limpia`
+GROUP BY
+ gender,
+ age_group,
+ usertype
+ORDER BY
+ age_group ASC;
+
+
+ ---Query para verificar las edades de los usuarios
+SELECT
+ MAX(age) AS max_age,
+ Min (age) AS min_age
+FROM
+ `Dataset.citi_bike_trip_limpia`;
+
+
+ ---Query para identificar usuarios con más de 90 años
+SELECT
+ *
+FROM
+ `Dataset.citi_bike_trip_limpia`
+WHERE
+ age > 90
+ORDER BY
+ age ASC;
+
+
+--- Query para identificar tripduration_min mayor a 1440 minutos
+SELECT *
+FROM `Dataset.citi_bike_trip_limpia`
+WHERE tripduration_min > 1440
+order by tripduration_min ASC
+
+
+---Query para identificar las fechas del 2018
+SELECT
+ *
+FROM
+ `Dataset.citi_bike_trip_limpia`
+WHERE
+ EXTRACT(YEAR FROM stopdate) = 2018;
+
+
+Vistas:
+
+
+---Query para la tabla limpia
+SELECT
+ * EXCEPT (customer_plan),
+ tripduration / 60.0 AS tripduration_min,
+ DATE(stoptime) AS stopdate,
+ EXTRACT(YEAR
+ FROM
+   CURRENT_DATE()) - birth_year AS age
+FROM
+ `Dataset.citi_bike_trip`
+WHERE
+ birth_year IS NOT NULL
+ AND birth_year > 1921;
