@@ -72,6 +72,8 @@ __5. Unir Tablas__
 
 Este proceso es fundamental para asegurar la calidad y precisión del análisis subsiguiente. 
 
+Para conocer más detalles, resultados, conclusiones, patrones identificados y recomendaciones consultar la ficha técnica.
+
 ## Herramientas
 
 * Google BigQuery
